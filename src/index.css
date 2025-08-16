@@ -2,47 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Contract Vault Design System - Professional fintech aesthetic with cool blues and clean typography */
-
+/*
+ * =================================================================================
+ * BASE LAYER
+ * Contains all foundational styles: CSS variables for theming, global element styles,
+ * and custom base utility classes.
+ * =================================================================================
+ */
 @layer base {
   :root {
     /* Core neutrals */
     --background: 0 0% 100%;
     --foreground: 210 24% 16%;
-    
+
     /* Cool blue primary palette */
     --primary: 210 100% 56%;
     --primary-foreground: 0 0% 100%;
     --primary-muted: 210 100% 97%;
     --primary-light: 210 100% 92%;
-    
+
     /* Professional secondary palette */
     --secondary: 210 20% 98%;
     --secondary-foreground: 210 24% 16%;
-    
+
     /* Muted green accent */
     --accent: 142 76% 36%;
     --accent-foreground: 0 0% 100%;
     --accent-muted: 142 76% 96%;
     --accent-light: 142 76% 92%;
-    
+
     /* Sophisticated grays */
     --muted: 210 20% 98%;
     --muted-foreground: 210 16% 46%;
-    
-    /* Cards and surfaces */
+
+    /* Surfaces */
     --card: 0 0% 100%;
     --card-foreground: 210 24% 16%;
-    
-    /* Interactive elements */
     --popover: 0 0% 100%;
     --popover-foreground: 210 24% 16%;
-    
+
     /* Borders and inputs */
     --border: 210 20% 89%;
     --input: 210 20% 96%;
     --ring: 210 100% 56%;
-    
+
     /* Status colors */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -50,92 +53,34 @@
     --warning-foreground: 0 0% 100%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
-    
-    /* Soft shadows and gradients */
-    --shadow-soft: 210 25% 88%;
-    --shadow-medium: 210 25% 84%;
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 56%), hsl(210 100% 64%));
-    --gradient-accent: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 44%));
-    --gradient-hero: linear-gradient(135deg, hsl(210 100% 97%) 0%, hsl(210 100% 99%) 100%);
-    
+
     /* Border radius system */
     --radius: 12px;
     --radius-sm: 8px;
     --radius-lg: 16px;
     --radius-xl: 24px;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
     --background: 210 24% 8%;
     --foreground: 210 20% 98%;
-    
-    --primary: 210 100% 56%;
-    --primary-foreground: 0 0% 100%;
     --primary-muted: 210 100% 12%;
     --primary-light: 210 100% 16%;
-    
     --secondary: 210 24% 12%;
     --secondary-foreground: 210 20% 98%;
-    
-    --accent: 142 76% 36%;
-    --accent-foreground: 0 0% 100%;
     --accent-muted: 142 76% 12%;
     --accent-light: 142 76% 16%;
-    
     --muted: 210 24% 12%;
     --muted-foreground: 210 16% 54%;
-    
     --card: 210 24% 10%;
     --card-foreground: 210 20% 98%;
-    
     --popover: 210 24% 10%;
     --popover-foreground: 210 20% 98%;
-    
     --border: 210 24% 16%;
     --input: 210 24% 14%;
-    --ring: 210 100% 56%;
-    
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --warning: 43 96% 56%;
-    --warning-foreground: 0 0% 100%;
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    
-    --shadow-soft: 210 25% 4%;
-    --shadow-medium: 210 25% 2%;
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 56%), hsl(210 100% 64%));
-    --gradient-accent: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 44%));
-    --gradient-hero: linear-gradient(135deg, hsl(210 24% 8%) 0%, hsl(210 24% 12%) 100%);
-    
-    --sidebar-background: 210 24% 10%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 210 100% 56%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 24% 14%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 210 24% 16%;
-    --sidebar-ring: 210 100% 56%;
   }
-}
 
-@layer base {
+  /* Global element styles */
   * {
     @apply border-border;
   }
@@ -144,46 +89,71 @@
     @apply bg-background text-foreground font-inter antialiased;
   }
 
-  /* Professional typography scale */
-  .text-display {
-    @apply text-5xl font-semibold tracking-tight;
-  }
-  
-  .text-headline {
-    @apply text-4xl font-semibold tracking-tight;
-  }
-  
-  .text-title {
-    @apply text-2xl font-semibold tracking-tight;
-  }
-  
-  .text-subtitle {
-    @apply text-lg font-medium;
-  }
-  
-  .text-body {
-    @apply text-base leading-relaxed;
-  }
-  
-  .text-small {
-    @apply text-sm text-muted-foreground;
+  /* Custom base utility classes */
+  .text-display { @apply text-5xl font-semibold tracking-tight; }
+  .text-headline { @apply text-4xl font-semibold tracking-tight; }
+  .text-title { @apply text-2xl font-semibold tracking-tight; }
+  .text-subtitle { @apply text-lg font-medium; }
+  .text-body { @apply text-base leading-relaxed; }
+  .text-small { @apply text-sm text-muted-foreground; }
+}
+
+/*
+ * =================================================================================
+ * COMPONENTS LAYER
+ * Contains styles for reusable components, like our hero background animation.
+ * =================================================================================
+ */
+/* In your index.css or globals.css */
+
+@layer components {
+  /* Hero Background Animation */
+  .area {
+    @apply absolute inset-0 z-0 h-full w-full overflow-hidden;
   }
 
-  /* Professional shadows */
-  .shadow-elegant {
-    box-shadow: 0 1px 3px 0 hsl(var(--shadow-soft) / 0.1), 0 1px 2px 0 hsl(var(--shadow-soft) / 0.06);
-  }
-  
-  .shadow-soft {
-    box-shadow: 0 4px 6px -1px hsl(var(--shadow-soft) / 0.1), 0 2px 4px -1px hsl(var(--shadow-soft) / 0.06);
-  }
-  
-  .shadow-medium {
-    box-shadow: 0 10px 15px -3px hsl(var(--shadow-medium) / 0.1), 0 4px 6px -2px hsl(var(--shadow-medium) / 0.05);
+  .circles {
+    @apply absolute inset-0 h-full w-full overflow-hidden;
   }
 
-  /* Smooth interactions */
-  .transition-smooth {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  .circles li {
+    @apply absolute bottom-[-150px] block list-none h-5 w-5 rounded-md;
+    background-color:hsla(128, 73%, 80%, 0.358);
+    animation: animate 20s linear infinite;
+  }
+
+  /* --- Styles for all 15 shapes with BALANCED distribution --- */
+  .circles li:nth-child(1) { @apply h-20 w-20; left: 25%; animation-delay: 0s; }
+  .circles li:nth-child(2) { @apply h-5 w-5; left: 10%; animation-delay: 2s; animation-duration: 12s; }
+  .circles li:nth-child(3) { @apply h-5 w-5; left: 70%; animation-delay: 4s; animation-duration: 15s; }
+  .circles li:nth-child(4) { @apply h-16 w-16; left: 40%; animation-delay: 0s; animation-duration: 18s; }
+  .circles li:nth-child(5) { @apply h-5 w-5; left: 65%; animation-delay: 0s; animation-duration: 11s; }
+  .circles li:nth-child(6) { @apply h-28 w-28; left: 75%; animation-delay: 3s; }
+
+  /* ADJUSTED: This large square now starts immediately on the far left */
+  .circles li:nth-child(7) { @apply h-36 w-36; left: 15%; animation-delay: 0s; animation-duration: 11s; }
+  
+  .circles li:nth-child(8) { @apply h-6 w-6; left: 50%; animation-delay: 15s; animation-duration: 45s; }
+  .circles li:nth-child(9) { @apply h-4 w-4; left: 20%; animation-delay: 2s; animation-duration: 35s; }
+
+  /* ADJUSTED: This large square now starts on the right with a longer delay */
+  .circles li:nth-child(10) { @apply h-36 w-36; left: 85%; animation-delay: 7s; }
+
+  .circles li:nth-child(11) { @apply h-24 w-24; left: 5%; animation-delay: 1s; animation-duration: 22s; }
+  .circles li:nth-child(12) { @apply h-6 w-6; left: 25%; animation-delay: 5s; animation-duration: 14s; }
+  .circles li:nth-child(13) { @apply h-32 w-32; left: 55%; animation-delay: 2s; animation-duration: 28s; }
+  .circles li:nth-child(14) { @apply h-8 w-8; left: 80%; animation-delay: 6s; animation-duration: 16s; }
+  .circles li:nth-child(15) { @apply h-14 w-14; left: 90%; animation-delay: 9s; animation-duration: 19s; }
+
+  /* The animation keyframes */
+  @keyframes animate {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+      opacity: 0;
+    }
   }
 }
