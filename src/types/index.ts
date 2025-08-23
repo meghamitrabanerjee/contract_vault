@@ -1,8 +1,8 @@
-export interface Project {
+  export interface Project {
     id: number;
     title: string;
     client: string;
-    status: 'active' | 'completed' | 'pending' | 'overdue';
+    status: 'active' | 'completed' | 'pending' | 'overdue' | 'rejected';
     budget: number;
     paid: number;
     deadline: string;
@@ -42,6 +42,6 @@ export interface Project {
     metrics: {
       activeProjects: number;
       completedProjects: number;
-      pendingPayments: number;
+      rejectedContracts: number;
     };
   }

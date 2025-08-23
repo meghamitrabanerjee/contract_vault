@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Contact as FileContract, Users, Clock, CheckCircle, AlertTriangle, TrendingUp, Search, Filter, MoreHorizontal, Edit3 } from 'lucide-react';
 import { useDashboard } from '../hooks/useDashboard';
 import { ContractsList } from '../components/ContractList';
@@ -89,7 +89,23 @@ const MetricCard: React.FC<{ title: string; value: string; icon: React.ReactNode
 function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const disputeMenuRef = useRef<HTMLDivElement>(null);
   const { dashboardData, loading, error, refetch, updateUserProfile, downloadContract } = useDashboard();
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (disputeMenuRef.current && !disputeMenuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleUpdateProfile = async () => {
     try {
@@ -127,9 +143,7 @@ function DashboardPage() {
     return matchesSearch && matchesFilter;
   });
 
-  const pendingPaymentsAmount = payments.reduce((sum, payment) => 
-    payment.status === 'pending' ? sum + payment.amount : sum, 0
-  );
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -179,11 +193,25 @@ function DashboardPage() {
             value={metrics.completedProjects.toString()}
             icon={<CheckCircle className="w-6 h-6" />}
           />
-          <MetricCard
-            title="Pending Payments"
-            value={`$${pendingPaymentsAmount.toLocaleString()}`}
-            icon={<Clock className="w-6 h-6" />}
-          />
+                                           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-emerald-50 rounded-lg">
+                  <div className="text-emerald-600">
+                    <FileContract className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-gray-900">Contract Actions</h3>
+                <button
+                  onClick={() => console.log('Generate contract clicked')}
+                  className="w-full flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                >
+                  <FileContract className="w-4 h-4" />
+                  <span>Generate Contract</span>
+                </button>
+              </div>
+            </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -204,6 +232,7 @@ function DashboardPage() {
                       <option value="completed">Completed</option>
                       <option value="pending">Pending</option>
                       <option value="overdue">Overdue</option>
+                      <option value="rejected">Rejected</option>
                     </select>
                   </div>
                 </div>
@@ -244,11 +273,32 @@ function DashboardPage() {
                         <td className="px-6 py-4 text-sm text-gray-600">
                           {new Date(project.deadline).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4">
-                          <button className="text-gray-400 hover:text-gray-600 transition-colors duration-200">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </button>
-                        </td>
+                                                 <td className="px-6 py-4">
+                           <div className="relative" ref={disputeMenuRef}>
+                             <button
+                               onClick={() => setOpenMenuId(openMenuId === project.id ? null : project.id)}
+                               className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                             >
+                               <MoreHorizontal className="w-4 h-4" />
+                             </button>
+                             {openMenuId === project.id && (
+                               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                                 <div className="py-1">
+                                   <button
+                                     onClick={() => {
+                                       console.log('Report dispute clicked for project:', project.id);
+                                       setOpenMenuId(null);
+                                     }}
+                                     className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                                   >
+                                     <AlertTriangle className="w-4 h-4 mr-3 text-red-500" />
+                                     Report Dispute
+                                   </button>
+                                 </div>
+                               </div>
+                             )}
+                           </div>
+                         </td>
                       </tr>
                     ))}
                   </tbody>
