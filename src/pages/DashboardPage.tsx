@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Contact as FileContract, Users, Clock, CheckCircle, AlertTriangle, TrendingUp, Search, Filter, MoreHorizontal, Edit3 } from 'lucide-react';
-import { useDashboard } from '../hooks/useDashboard';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchDashboardData, updateUserProfile, setSearchTerm, setFilterStatus } from '../store/slices/dashboardSlice';
+import { downloadContract, generateContract, reportDispute } from '../store/slices/contractSlice';
+import { 
+  selectDashboardData, 
+  selectDashboardLoading, 
+  selectDashboardError, 
+  selectSearchTerm, 
+  selectFilterStatus,
+  selectFilteredProjects,
+  selectUserProfile,
+  selectDashboardMetrics,
+  selectPayments,
+  selectProjects
+} from '../store/selectors';
 import { ContractsList } from '../components/ContractList';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
@@ -87,11 +101,24 @@ const MetricCard: React.FC<{ title: string; value: string; icon: React.ReactNode
 };
 
 function DashboardPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const dispatch = useAppDispatch();
+  const dashboardData = useAppSelector(selectDashboardData);
+  const loading = useAppSelector(selectDashboardLoading);
+  const error = useAppSelector(selectDashboardError);
+  const searchTerm = useAppSelector(selectSearchTerm);
+  const filterStatus = useAppSelector(selectFilterStatus);
+  const filteredProjects = useAppSelector(selectFilteredProjects);
+  const user = useAppSelector(selectUserProfile);
+  const metrics = useAppSelector(selectDashboardMetrics);
+  const payments = useAppSelector(selectPayments);
+  const projects = useAppSelector(selectProjects);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const disputeMenuRef = useRef<HTMLDivElement>(null);
-  const { dashboardData, loading, error, refetch, updateUserProfile, downloadContract } = useDashboard();
+
+  // Fetch dashboard data on component mount
+  useEffect(() => {
+    dispatch(fetchDashboardData());
+  }, [dispatch]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -112,7 +139,7 @@ function DashboardPage() {
       // This would typically open a modal or form
       // For now, we'll just log and could integrate with a form
       console.log('Update profile clicked');
-      // Example: await updateUserProfile({ name: 'New Name' });
+      // Example: await dispatch(updateUserProfile({ name: 'New Name' }));
     } catch (error) {
       console.error('Failed to update profile:', error);
     }
@@ -120,9 +147,26 @@ function DashboardPage() {
 
   const handleDownloadContract = async (contractId: number, fileName: string) => {
     try {
-      await downloadContract(contractId, fileName);
+      await dispatch(downloadContract({ contractId, fileName })).unwrap();
     } catch (error) {
       console.error('Failed to download contract:', error);
+    }
+  };
+
+  const handleGenerateContract = async () => {
+    try {
+      await dispatch(generateContract({ title: 'New Project' })).unwrap();
+    } catch (error) {
+      console.error('Failed to generate contract:', error);
+    }
+  };
+
+  const handleReportDispute = async (projectId: number) => {
+    try {
+      await dispatch(reportDispute({ projectId, reason: 'Dispute reported' })).unwrap();
+      setOpenMenuId(null);
+    } catch (error) {
+      console.error('Failed to report dispute:', error);
     }
   };
 
@@ -131,17 +175,10 @@ function DashboardPage() {
   }
 
   if (error || !dashboardData) {
-    return <ErrorMessage message={error || 'Failed to load dashboard data'} onRetry={refetch} />;
+    return <ErrorMessage message={error || 'Failed to load dashboard data'} onRetry={() => dispatch(fetchDashboardData())} />;
   }
 
-  const { user, projects, payments, metrics } = dashboardData;
 
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.client.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || project.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
 
 
 
@@ -160,13 +197,13 @@ function DashboardPage() {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search projects..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
-                />
+                                 <input
+                   type="text"
+                   placeholder="Search projects..."
+                   value={searchTerm}
+                   onChange={(e) => dispatch(setSearchTerm(e.target.value))}
+                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                 />
               </div>
               <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
                 <Filter className="w-5 h-5" />
@@ -203,10 +240,10 @@ function DashboardPage() {
               </div>
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold text-gray-900">Contract Actions</h3>
-                <button
-                  onClick={() => console.log('Generate contract clicked')}
-                  className="w-full flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 hover:scale-[1.02]"
-                >
+                                 <button
+                   onClick={handleGenerateContract}
+                   className="w-full flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                 >
                   <FileContract className="w-4 h-4" />
                   <span>Generate Contract</span>
                 </button>
@@ -222,11 +259,11 @@ function DashboardPage() {
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-semibold text-gray-900">Active Projects</h2>
                   <div className="flex space-x-2">
-                    <select
-                      value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
-                      className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
-                    >
+                                         <select
+                       value={filterStatus}
+                       onChange={(e) => dispatch(setFilterStatus(e.target.value))}
+                       className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                     >
                       <option value="all">All Status</option>
                       <option value="active">Active</option>
                       <option value="completed">Completed</option>
@@ -284,13 +321,10 @@ function DashboardPage() {
                              {openMenuId === project.id && (
                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
                                  <div className="py-1">
-                                   <button
-                                     onClick={() => {
-                                       console.log('Report dispute clicked for project:', project.id);
-                                       setOpenMenuId(null);
-                                     }}
-                                     className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                                   >
+                                                                       <button
+                                      onClick={() => handleReportDispute(project.id)}
+                                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                                    >
                                      <AlertTriangle className="w-4 h-4 mr-3 text-red-500" />
                                      Report Dispute
                                    </button>
