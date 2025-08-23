@@ -43,9 +43,6 @@ const App = () => (
                   onRegister={() => {
                     // TODO: Implement registration logic or navigation
                   }}
-                  onBackToLogin={() => {
-                    // TODO: Implement navigation back to login
-                  }}
                 />
               }
             />
@@ -55,9 +52,6 @@ const App = () => (
                 <Login
                   onLogin={() => {
                     // TODO: Implement login logic or navigation
-                  }}
-                  onGoToRegister={() => {
-                    // TODO: Implement navigation to register
                   }}
                 />
               }

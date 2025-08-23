@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { DashboardData, Project, Payment, DashboardMetrics } from '../../types';
+import { DashboardData, Project, Payment } from '../../types';
 import { apiService } from '../../services/api';
 import { mockDashboardData } from '../../mockdata';
 

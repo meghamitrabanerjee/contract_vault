@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Contract } from '../../types';
+import { apiService } from '../../services/api';
 
 interface ContractState {
   contracts: Contract[];
@@ -98,11 +99,5 @@ const contractSlice = createSlice({
   },
 });
 
-export const { 
-  setSelectedContract, 
-  clearError, 
-  addContract, 
-  updateContract, 
-  removeContract 
-} = contractSlice.actions;
+export const { setSelectedContract, clearError, addContract, updateContract, removeContract } = contractSlice.actions;
 export default contractSlice.reducer;
