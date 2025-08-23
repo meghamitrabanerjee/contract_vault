@@ -7,8 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Your main pages
 import Index from "./pages/Index";
-import RoleSelection from "./pages/RoleSelection";
-import FreelancerOnboarding from "./pages/onboarding/FreelancerOnboarding";
+
 import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 import CreateContract from "./pages/contracts/CreateContract";
@@ -28,8 +27,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/role-selection" element={<RoleSelection />} />
-          <Route path="/onboarding/freelancer" element={<FreelancerOnboarding />} />
+          
           <Route path="/dashboard" element={<DashboardPage />} /> {/* ✅ dashboard here */}
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/contracts/create" element={<CreateContract />} />
