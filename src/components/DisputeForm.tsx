@@ -62,7 +62,7 @@ const DisputeForm: React.FC<DisputeFormProps> = ({ project, onClose, onSubmit })
     e.preventDefault();
     
     if (!complaintText.trim()) {
-      alert('Please provide a complaint description');
+      alert('Please provide an update description');
       return;
     }
 
