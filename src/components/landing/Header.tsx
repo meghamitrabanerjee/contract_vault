@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
+import { Link } from "react-router-dom";  // ✅ import Link
 
 export const Header = () => {
   return (
@@ -15,15 +16,15 @@ export const Header = () => {
 
         {/* Navigation links */}
         <nav className="hidden md:flex items-center gap-8">
-          <a href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
             Home
-          </a>
+          </Link>
           <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
             Features
           </a>
-          <a href="/how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
             How It Works
-          </a>
+          </Link>
           <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
             About
           </a>
@@ -34,19 +35,23 @@ export const Header = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-3">
+          {/* ✅ Link Sign In to Login.tsx */}
           <Button
             variant="ghost"
             size="sm"
             className="border border-emerald-500 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100/20"
+            asChild
           >
-            Sign In
+            <Link to="/login">Sign In</Link>
           </Button>
+
+          {/* ✅ Link Sign Up to Register.tsx */}
           <Button
             size="sm"
             className="bg-emerald-500 hover:bg-emerald-600 text-white"
             asChild
           >
-            <a href="/role-selection">Sign Up</a>
+            <Link to="/register">Sign Up</Link>
           </Button>
         </div>
       </div>

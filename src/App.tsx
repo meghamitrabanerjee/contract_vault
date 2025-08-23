@@ -16,7 +16,7 @@ import CreateContract from "./pages/contracts/CreateContract";
 // ✅ Bolt dashboard page
 import DashboardPage from "./pages/DashboardPage";
 import Register from "./pages/Register";
-import Login  from "./pages/Login";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -40,9 +40,6 @@ const App = () => (
                 onRegister={() => {
                   // TODO: Implement registration logic or navigation
                 }}
-                onBackToLogin={() => {
-                  // TODO: Implement navigation back to login
-                }}
               />
             }
           />
@@ -53,12 +50,10 @@ const App = () => (
                 onLogin={() => {
                   // TODO: Implement login logic or navigation
                 }}
-                onGoToRegister={() => {
-                  // TODO: Implement navigation to register
-                }}
               />
             }
           />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
