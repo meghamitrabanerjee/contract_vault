@@ -1,87 +1,65 @@
-import { DashboardData, UserProfile } from '../types';
+import { DashboardData } from '../types';
+import { mockDashboardData } from '../mockdata';
 
-const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3001/api';
-
-class ApiService {
-  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        // Add authorization header if token exists
-        ...(localStorage.getItem('token') && {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }),
-      },
-      ...options,
-    };
-
-    try {
-      const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error(`API request failed: ${endpoint}`, error);
-      throw error;
-    }
-  }
-
-  // Dashboard data
+// Mock API service - replace with real API calls when backend is ready
+export const apiService = {
+  // Dashboard API calls
   async getDashboardData(): Promise<DashboardData> {
-    return this.request<DashboardData>('/dashboard');
-  }
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return mockDashboardData;
+  },
 
-  // User profile
-  async getUserProfile(): Promise<UserProfile> {
-    return this.request<UserProfile>('/user/profile');
-  }
+  async updateUserProfile(userData: any): Promise<any> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return { ...mockDashboardData.user, ...userData };
+  },
 
-  async updateUserProfile(userData: Partial<UserProfile>): Promise<UserProfile> {
-    return this.request<UserProfile>('/user/profile', {
-      method: 'PUT',
-      body: JSON.stringify(userData),
-    });
-  }
+  // Contract API calls
+  async downloadContract(contractId: number, fileName: string): Promise<void> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 200));
+    console.log(`Downloading contract ${contractId}: ${fileName}`);
+  },
 
-  // Contract downloads
-  async downloadContract(contractId: number): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/contracts/${contractId}/download`, {
-      headers: {
-        ...(localStorage.getItem('token') && {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }),
-      },
-    });
+  async generateContract(projectData: any): Promise<any> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Generating contract for project:', projectData);
+    return {
+      id: Date.now(),
+      title: `Contract for ${projectData.title}`,
+      fileName: `contract_${projectData.id || Date.now()}.pdf`,
+      url: '#',
+      createdAt: new Date().toISOString(),
+    };
+  },
 
-    if (!response.ok) {
-      throw new Error(`Failed to download contract: ${response.status}`);
-    }
+  async reportDispute(projectId: number, reason: string): Promise<any> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log(`Reporting dispute for project ${projectId}: ${reason}`);
+    return { projectId, reason, status: 'pending' };
+  },
 
-    return response.blob();
-  }
+  // User API calls
+  async loginUser(credentials: { email: string; password: string }): Promise<any> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    console.log('Login attempt:', credentials.email);
+    return {
+      id: 1,
+      name: 'John Doe',
+      email: credentials.email,
+      role: 'freelancer',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    };
+  },
 
-  // Projects
-  async getProjects(filters?: { status?: string; search?: string }) {
-    const params = new URLSearchParams();
-    if (filters?.status && filters.status !== 'all') {
-      params.append('status', filters.status);
-    }
-    if (filters?.search) {
-      params.append('search', filters.search);
-    }
-    
-    const queryString = params.toString();
-    return this.request(`/projects${queryString ? `?${queryString}` : ''}`);
-  }
-
-  // Payments
-  async getUpcomingPayments() {
-    return this.request('/payments/upcoming');
-  }
-}
-
-export const apiService = new ApiService();
+  async logoutUser(): Promise<void> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 200));
+    console.log('User logged out');
+  },
+};
