@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DashboardData, Project, Payment, UserProfile } from '../types';
 import { apiService } from '../services/api';
 import { mockDashboardData } from '../mockdata';
+import { mockClientDashboardData } from '../mockdata-client';
 
 export const useDashboard = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -14,7 +15,9 @@ export const useDashboard = () => {
       setError(null);
       
       // Use mock data directly for now since backend is not ready
-      setDashboardData(mockDashboardData);
+      // You can switch between freelancer and client views by changing this line
+      setDashboardData(mockDashboardData); // For freelancer view
+      // setDashboardData(mockClientDashboardData); // For client view
     } catch (error) {
       console.error('Dashboard error:', error);
       setError('Failed to load dashboard data.');

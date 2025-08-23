@@ -5,7 +5,7 @@ export const mockDashboardData: DashboardData = {
     id: 1,
     name: "John Smith",
     email: "john.smith@example.com",
-    role: "Senior Developer",
+    role: "freelancer", // Change to "client" to test client functionality
     avatar: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
     phone: "+1 (555) 123-4567"
   },
@@ -21,6 +21,37 @@ export const mockDashboardData: DashboardData = {
       contracts: [
         { id: 1, name: "Initial Contract.pdf", url: "/contracts/1", uploadDate: "2024-01-10", size: "2.3 MB" },
         { id: 2, name: "Amendment 1.pdf", url: "/contracts/2", uploadDate: "2024-01-20", size: "1.1 MB" }
+      ],
+      progressSubmissions: [
+        {
+          id: 1,
+          projectId: 1,
+          submittedBy: "John Smith",
+          submittedAt: "2024-01-25T10:30:00Z",
+          files: [
+            {
+              id: 1,
+              name: "frontend-screenshots.zip",
+              url: "https://storage.example.com/progress/frontend-screenshots.zip",
+              size: "2.5 MB",
+              type: "application/zip",
+              uploadDate: "2024-01-25T10:30:00Z"
+            },
+            {
+              id: 2,
+              name: "database-schema.pdf",
+              url: "https://storage.example.com/progress/database-schema.pdf",
+              size: "1.2 MB",
+              type: "application/pdf",
+              uploadDate: "2024-01-25T10:30:00Z"
+            }
+          ],
+          description: "Completed the frontend development phase including user authentication, product catalog, and shopping cart functionality. Database schema has been finalized and implemented. Ready for client review.",
+          status: "pending",
+          reviewedBy: undefined,
+          reviewedAt: undefined,
+          feedback: undefined
+        }
       ]
     },
     {
