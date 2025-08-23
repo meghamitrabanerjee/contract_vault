@@ -1,139 +1,131 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Shield,
-  User,
+  User as UserIcon,
   Mail,
   Lock,
   Eye,
   EyeOff,
   Building2,
-  Briefcase,
+  Landmark,
+  CreditCard,
+  Image as ImageIcon,
   ArrowRight,
   CheckCircle,
   AlertCircle,
+  Upload,
+  X,
+  AtSign
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { User as UserType, mockUsers, generateStarterData } from "@/lib/mockData";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { registerUser, clearError } from "../store/slices/userSlice";
 
-interface RegisterProps {
-  onRegister: (user: UserType) => void;
-}
-
-const Register = ({ onRegister }: RegisterProps) => {
+const Register = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { loading, error, isAuthenticated } = useAppSelector(state => state.user);
+  
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
     userType: "freelancer" as "freelancer" | "client",
-    company: "",
-    skills: [""],
     password: "",
     confirmPassword: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // 🔹 Input change handler
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Skills handling
-  const handleSkillChange = (index: number, value: string) => {
-    const newSkills = [...formData.skills];
-    newSkills[index] = value;
-    setFormData((prev) => ({ ...prev, skills: newSkills }));
-  };
-
-  const addSkill = () => {
-    setFormData((prev) => ({ ...prev, skills: [...prev.skills, ""] }));
-  };
-
-  const removeSkill = (index: number) => {
-    if (formData.skills.length > 1) {
-      setFormData((prev) => ({
-        ...prev,
-        skills: prev.skills.filter((_, i) => i !== index),
-      }));
+  const validateForm = () => {
+    if (!formData.fullName.trim()) {
+      return "Full name is required";
     }
-  };
-
-  // 🔹 Register form submit
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setIsLoading(true);
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      setIsLoading(false);
-      return;
+    if (!formData.email.trim()) {
+      return "Email is required";
     }
-
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return "Please enter a valid email address";
+    }
     if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      setIsLoading(false);
+      return "Password must be at least 6 characters long";
+    }
+    if (formData.password !== formData.confirmPassword) {
+      return "Passwords do not match";
+    }
+    return null;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccess("");
+
+    const validationError = validateForm();
+    if (validationError) {
+      // Handle validation error (you might want to show this in the UI)
+      console.error(validationError);
       return;
     }
 
     try {
-      const existingUser = mockUsers.find(
-        (user) => user.email === formData.email
-      );
-      if (existingUser) {
-        setError("User with this email already exists.");
-        setIsLoading(false);
-        return;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const newUser: UserType = {
-        id: Date.now().toString(),
+      const userData = {
+        name: formData.fullName,
         email: formData.email,
         password: formData.password,
-        userType: formData.userType,
-        name: formData.name,
-        company: formData.userType === "client" ? formData.company : undefined,
-        skills:
-          formData.userType === "freelancer"
-            ? formData.skills.filter((s) => s.trim())
-            : undefined,
+        role: formData.userType,
       };
 
-      mockUsers.push(newUser);
-      generateStarterData(newUser.id, newUser.userType, newUser.name);
-
-      setSuccess(`Welcome ${formData.name}! Redirecting...`);
-      setTimeout(() => onRegister(newUser), 2000);
-    } catch {
-      setError("Registration failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+      await dispatch(registerUser(userData)).unwrap();
+      setSuccess("Registration successful! Redirecting to dashboard...");
+      
+      // Redirect after successful registration
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 2000);
+    } catch (err) {
+      // Error is handled by Redux
+      console.error("Registration failed:", err);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-white flex items-center justify-center p-6">
       <div className="w-full max-w-md animate-fadeInUp">
-        {/* Logo + Title */}
+        {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center shadow-md">
               <Shield className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-emerald-700">Contract Vault</h1>
+            <h1 className="text-2xl font-bold text-emerald-700">
+              Contract Vault
+            </h1>
           </div>
           <p className="text-emerald-600 text-sm">
             Create your account to get started
@@ -144,223 +136,189 @@ const Register = ({ onRegister }: RegisterProps) => {
         <Card className="border border-emerald-200 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm transition-transform duration-300 hover:scale-[1.01]">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-xl font-semibold text-emerald-700">
-              Create Your Account ✨
+              Create Account
             </CardTitle>
+            <p className="text-sm text-emerald-600">
+              Join our secure platform
+            </p>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleRegister} className="space-y-5">
-              {/* Full Name */}
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <div className="relative mt-1">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+          <CardContent className="space-y-4">
+            {/* Success Message */}
+            {success && (
+              <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm">{success}</span>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Full Name Input */}
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-sm font-medium text-emerald-700">
+                  Full Name
+                </Label>
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400 w-4 h-4" />
                   <Input
-                    id="name"
-                    name="name"
+                    id="fullName"
+                    name="fullName"
                     type="text"
-                    placeholder="John Doe"
-                    value={formData.name}
+                    placeholder="Enter your full name"
+                    value={formData.fullName}
                     onChange={handleInputChange}
-                    className="pl-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
+                    className="pl-10 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
                     required
                   />
                 </div>
               </div>
 
-              {/* Email */}
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <div className="relative mt-1">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+              {/* Email Input */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-emerald-700">
+                  Email Address
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400 w-4 h-4" />
                   <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder="Enter your email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="pl-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
+                    className="pl-10 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
                     required
                   />
                 </div>
               </div>
 
-              {/* User Type */}
-              <div>
-                <Label htmlFor="userType">I am a</Label>
-                <select
-                  id="userType"
-                  name="userType"
-                  value={formData.userType}
-                  onChange={handleInputChange}
-                  className="w-full mt-1 px-3 py-2 border border-emerald-200 rounded-md bg-white text-sm focus:border-emerald-400 focus:ring-emerald-300"
-                >
-                  <option value="freelancer">Freelancer</option>
-                  <option value="client">Client Company</option>
-                </select>
+              {/* User Type Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="userType" className="text-sm font-medium text-emerald-700">
+                  I am a
+                </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, userType: "freelancer" }))}
+                    className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                      formData.userType === "freelancer"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                        : "border-emerald-200 bg-white text-emerald-600 hover:border-emerald-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <UserIcon className="w-4 h-4" />
+                      <span className="text-sm font-medium">Freelancer</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, userType: "client" }))}
+                    className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                      formData.userType === "client"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                        : "border-emerald-200 bg-white text-emerald-600 hover:border-emerald-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4" />
+                      <span className="text-sm font-medium">Client</span>
+                    </div>
+                  </button>
+                </div>
               </div>
 
-              {/* Company (only for client) */}
-              {formData.userType === "client" && (
-                <div>
-                  <Label htmlFor="company">Company Name</Label>
-                  <div className="relative mt-1">
-                    <Building2 className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
-                    <Input
-                      id="company"
-                      name="company"
-                      type="text"
-                      placeholder="Your company name"
-                      value={formData.company}
-                      onChange={handleInputChange}
-                      className="pl-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Skills (only for freelancer) */}
-              {formData.userType === "freelancer" && (
-                <div>
-                  <Label>Skills</Label>
-                  <div className="space-y-2">
-                    {formData.skills.map((skill, index) => (
-                      <div key={index} className="flex gap-2">
-                        <div className="relative flex-1">
-                          <Briefcase className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
-                          <Input
-                            type="text"
-                            placeholder="e.g. React, Node.js"
-                            value={skill}
-                            onChange={(e) =>
-                              handleSkillChange(index, e.target.value)
-                            }
-                            className="pl-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
-                            required
-                          />
-                        </div>
-                        {formData.skills.length > 1 && (
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={() => removeSkill(index)}
-                            className="px-2 border border-emerald-500 bg-emerald-500 text-white hover:text-red-500 hover:bg-gray-100"
-                          >
-                            ×
-                          </Button>
-
-                        )}
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={addSkill}
-                      className="w-full border border-emerald-500 bg-emerald-500 text-white hover:bg-gray-100 hover:text-emerald-600"
-                    >
-                      + Add Skill
-                    </Button>
-
-                  </div>
-                </div>
-              )}
-
-              {/* Password */}
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <div className="relative mt-1">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+              {/* Password Input */}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium text-emerald-700">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400 w-4 h-4" />
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Create a password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="pl-10 pr-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
+                    className="pl-10 pr-10 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
                     required
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-400 hover:text-emerald-600"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-emerald-600" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-emerald-600" />
-                    )}
-                  </Button>
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
-              {/* Confirm Password */}
-              <div>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative mt-1">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+              {/* Confirm Password Input */}
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-emerald-700">
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400 w-4 h-4" />
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Confirm your password"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className="pl-10 pr-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
+                    className="pl-10 pr-10 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
                     required
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-400 hover:text-emerald-600"
                   >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-emerald-600" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-emerald-600" />
-                    )}
-                  </Button>
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
-              {/* Error / Success */}
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md animate-shake">
-                  <AlertCircle className="h-4 w-4 text-red-500" />
-                  <span className="text-sm text-red-600">{error}</span>
-                </div>
-              )}
-              {success && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-md animate-fadeIn">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-600">{success}</span>
-                </div>
-              )}
-
-              {/* Submit */}
+              {/* Register Button */}
               <Button
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg shadow-md transition-transform duration-300 hover:scale-[1.02]"
-                disabled={isLoading}
+                disabled={loading}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Creating account..." : "Create Account"}
-                <ArrowRight className="ml-2 h-4 w-4" />
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Creating Account...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    Create Account
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                )}
               </Button>
             </form>
 
-            {/* Back to Login */}
-            <div className="text-center mt-6">
-              <p className="text-sm text-emerald-700">
+            {/* Login Link */}
+            <div className="text-center pt-4 border-t border-emerald-100">
+              <p className="text-sm text-emerald-600">
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-emerald-600 hover:text-emerald-700 font-medium underline-offset-4 hover:underline transition-colors"
+                  className="text-emerald-700 hover:text-emerald-800 font-medium underline"
                 >
                   Sign in here
                 </Link>

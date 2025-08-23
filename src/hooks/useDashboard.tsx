@@ -3,8 +3,10 @@ import { DashboardData, Project, Payment, UserProfile } from '../types';
 import { apiService } from '../services/api';
 import { mockDashboardData } from '../mockdata';
 import { mockClientDashboardData } from '../mockdata-client';
+import { useAppSelector } from '../store/hooks';
 
 export const useDashboard = () => {
+  const { currentUser } = useAppSelector(state => state.user);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,10 +16,17 @@ export const useDashboard = () => {
       setLoading(true);
       setError(null);
       
-      // Use mock data directly for now since backend is not ready
-      // You can switch between freelancer and client views by changing this line
-      setDashboardData(mockDashboardData); // For freelancer view
-      // setDashboardData(mockClientDashboardData); // For client view
+      // Debug logging
+      console.log('Loading mock data for user:', currentUser);
+      
+      // Use mock data based on user role
+      if (currentUser?.role === 'client') {
+        console.log('Loading client dashboard data');
+        setDashboardData(mockClientDashboardData);
+      } else {
+        console.log('Loading freelancer dashboard data');
+        setDashboardData(mockDashboardData);
+      }
     } catch (error) {
       console.error('Dashboard error:', error);
       setError('Failed to load dashboard data.');
@@ -56,8 +65,10 @@ export const useDashboard = () => {
   };
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (currentUser) {
+      fetchDashboardData();
+    }
+  }, [currentUser]);
 
   return {
     dashboardData,

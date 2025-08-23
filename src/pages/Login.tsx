@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,22 +13,37 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
-import { Link } from "react-router-dom"; // ✅ use react-router-dom
-import { User, mockUsers } from "@/lib/mockData";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { loginUser, clearError } from "../store/slices/userSlice";
 
-interface LoginProps {
-  onLogin: (user: User) => void;
-}
-
-const Login = ({ onLogin }: LoginProps) => {
+const Login = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { loading, error, isAuthenticated } = useAppSelector(state => state.user);
+  
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = (location.state as any)?.from?.pathname || "/dashboard";
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const handleLoginInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,32 +55,20 @@ const Login = ({ onLogin }: LoginProps) => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
     setSuccess("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const user = mockUsers.find(
-        (u) => u.email === loginData.email && u.password === loginData.password
-      );
-
-      if (!user) {
-        setError("Invalid email or password. Please try again.");
-        setIsLoading(false);
-        return;
-      }
-
-      setSuccess(`Welcome back, ${user.name}! Redirecting...`);
-
+      await dispatch(loginUser(loginData)).unwrap();
+      setSuccess("Login successful! Redirecting...");
+      
+      // Redirect after successful login
       setTimeout(() => {
-        onLogin(user);
-      }, 2000);
+        const from = (location.state as any)?.from?.pathname || "/dashboard";
+        navigate(from, { replace: true });
+      }, 1000);
     } catch (err) {
-      setError("Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+      // Error is handled by Redux
+      console.error("Login failed:", err);
     }
   };
 
@@ -91,99 +94,117 @@ const Login = ({ onLogin }: LoginProps) => {
         <Card className="border border-emerald-200 shadow-lg rounded-2xl bg-white/90 backdrop-blur-sm transition-transform duration-300 hover:scale-[1.01]">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-xl font-semibold text-emerald-700">
-              Welcome Back 👋
+              Welcome Back
             </CardTitle>
             <p className="text-sm text-emerald-600">
               Sign in to access your dashboard
             </p>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-5">
-              {/* Email */}
-              <div>
-                <Label htmlFor="login-email">Email</Label>
-                <div className="relative mt-1">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+          <CardContent className="space-y-4">
+            {/* Success Message */}
+            {success && (
+              <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm">{success}</span>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Email Input */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-emerald-700">
+                  Email Address
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400 w-4 h-4" />
                   <Input
-                    id="login-email"
+                    id="email"
                     name="email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder="Enter your email"
                     value={loginData.email}
                     onChange={handleLoginInputChange}
-                    className="pl-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
+                    className="pl-10 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
                     required
                   />
                 </div>
               </div>
 
-              {/* Password */}
-              <div>
-                <Label htmlFor="login-password">Password</Label>
-                <div className="relative mt-1">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-emerald-500" />
+              {/* Password Input */}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium text-emerald-700">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400 w-4 h-4" />
                   <Input
-                    id="login-password"
+                    id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     value={loginData.password}
                     onChange={handleLoginInputChange}
-                    className="pl-10 pr-10 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-300 placeholder:text-gray-400 text-black"
+                    className="pl-10 pr-10 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
                     required
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-400 hover:text-emerald-600"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-emerald-600" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-emerald-600" />
-                    )}
-                  </Button>
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
-              {/* Error / Success Messages */}
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md animate-shake">
-                  <AlertCircle className="h-4 w-4 text-red-500" />
-                  <span className="text-sm text-red-600">{error}</span>
-                </div>
-              )}
-
-              {success && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-md animate-fadeIn">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-600">{success}</span>
-                </div>
-              )}
-
-              {/* Submit */}
+              {/* Login Button */}
               <Button
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg shadow-md transition-transform duration-300 hover:scale-[1.02]"
-                disabled={isLoading}
+                disabled={loading}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Signing in..." : "Sign In"}
-                <ArrowRight className="ml-2 h-4 w-4" />
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Signing In...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    Sign In
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                )}
               </Button>
             </form>
 
+            {/* Demo Credentials */}
+            <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <h3 className="text-sm font-medium text-emerald-700 mb-2">Demo Credentials:</h3>
+              <div className="space-y-1 text-xs text-emerald-600">
+                <p><strong>Freelancer:</strong> john@example.com / password123</p>
+                <p><strong>Client:</strong> sarah@example.com / password123</p>
+                <p><strong>Freelancer 2:</strong> mike@example.com / password123</p>
+              </div>
+            </div>
+
             {/* Register Link */}
-            <div className="text-center mt-6">
-              <p className="text-sm text-emerald-700">
-                Don’t have an account?{" "}
+            <div className="text-center pt-4 border-t border-emerald-100">
+              <p className="text-sm text-emerald-600">
+                Don't have an account?{" "}
                 <Link
-                  to="/register" // ✅ goes to Register.tsx
-                  className="text-emerald-600 hover:text-emerald-700 font-medium underline-offset-4 hover:underline transition-colors"
+                  to="/register"
+                  className="text-emerald-700 hover:text-emerald-800 font-medium underline"
                 >
-                  Register here
+                  Sign up here
                 </Link>
               </p>
             </div>

@@ -14,8 +14,8 @@ export const mockDashboardData: DashboardData = {
       id: 1,
       title: "E-commerce Platform Development",
       client: "TechCorp Inc.",
-      status: "active",
-      deadline: "2024-02-15",
+      status: "work-submitted",
+      deadline: "2025-03-15",
       budget: 25000,
       paid: 12500,
       contracts: [
@@ -58,8 +58,8 @@ export const mockDashboardData: DashboardData = {
       id: 2,
       title: "Mobile App Development",
       client: "StartupXYZ",
-      status: "active",
-      deadline: "2024-03-01",
+      status: "funded",
+      deadline: "2025-04-20",
       budget: 35000,
       paid: 17500,
       contracts: [
@@ -70,8 +70,8 @@ export const mockDashboardData: DashboardData = {
       id: 3,
       title: "Website Redesign",
       client: "Local Business",
-      status: "completed",
-      deadline: "2024-01-30",
+      status: "released",
+      deadline: "2025-01-15",
       budget: 15000,
       paid: 15000,
       contracts: [
@@ -82,8 +82,8 @@ export const mockDashboardData: DashboardData = {
       id: 4,
       title: "API Integration Project",
       client: "DataFlow Solutions",
-      status: "pending",
-      deadline: "2024-04-15",
+      status: "sent",
+      deadline: "2025-05-10",
       budget: 20000,
       paid: 0,
       contracts: [
@@ -94,8 +94,8 @@ export const mockDashboardData: DashboardData = {
       id: 5,
       title: "Database Optimization",
       client: "CloudTech Systems",
-      status: "overdue",
-      deadline: "2024-01-20",
+      status: "disputed",
+      deadline: "2025-02-28",
       budget: 12000,
       paid: 6000,
       contracts: [
@@ -106,8 +106,8 @@ export const mockDashboardData: DashboardData = {
       id: 6,
       title: "UI/UX Design Project",
       client: "Design Studio",
-      status: "rejected",
-      deadline: "2024-02-10",
+      status: "declined",
+      deadline: "2025-06-15",
       budget: 8000,
       paid: 0,
       contracts: [
@@ -118,8 +118,8 @@ export const mockDashboardData: DashboardData = {
       id: 7,
       title: "Content Management System",
       client: "Media Corp",
-      status: "rejected",
-      deadline: "2024-03-15",
+      status: "draft",
+      deadline: "2025-07-30",
       budget: 15000,
       paid: 0,
       contracts: [
@@ -130,12 +130,60 @@ export const mockDashboardData: DashboardData = {
       id: 8,
       title: "E-commerce Integration",
       client: "Retail Solutions",
-      status: "rejected",
-      deadline: "2024-02-28",
+      status: "accepted",
+      deadline: "2025-08-15",
       budget: 18000,
       paid: 0,
       contracts: [
         { id: 9, name: "Integration Contract.pdf", url: "/contracts/9", uploadDate: "2024-01-12", size: "3.1 MB" }
+      ]
+    },
+    {
+      id: 9,
+      title: "AI Chatbot Development",
+      client: "TechStart Inc.",
+      status: "funded",
+      deadline: "2025-09-20",
+      budget: 22000,
+      paid: 11000,
+      contracts: [
+        { id: 10, name: "AI Development Contract.pdf", url: "/contracts/10", uploadDate: "2024-01-18", size: "2.7 MB" }
+      ]
+    },
+    {
+      id: 10,
+      title: "Blockchain Wallet App",
+      client: "CryptoCorp",
+      status: "work-submitted",
+      deadline: "2025-10-05",
+      budget: 30000,
+      paid: 15000,
+      contracts: [
+        { id: 11, name: "Blockchain Contract.pdf", url: "/contracts/11", uploadDate: "2024-01-22", size: "4.2 MB" }
+      ]
+    },
+    {
+      id: 11,
+      title: "Video Streaming Platform",
+      client: "StreamTech",
+      status: "sent",
+      deadline: "2025-11-12",
+      budget: 45000,
+      paid: 0,
+      contracts: [
+        { id: 12, name: "Streaming Platform Contract.pdf", url: "/contracts/12", uploadDate: "2024-01-25", size: "3.8 MB" }
+      ]
+    },
+    {
+      id: 12,
+      title: "IoT Smart Home System",
+      client: "SmartLiving",
+      status: "draft",
+      deadline: "2025-12-01",
+      budget: 28000,
+      paid: 0,
+      contracts: [
+        { id: 13, name: "IoT Contract.pdf", url: "/contracts/13", uploadDate: "2024-01-28", size: "2.9 MB" }
       ]
     }
   ],
@@ -146,8 +194,8 @@ export const mockDashboardData: DashboardData = {
     { id: 4, client: "CloudTech Systems", amount: 6000, dueDate: "2024-01-20", status: "overdue" }
   ],
   metrics: {
-    activeProjects: 2,
-    completedProjects: 1,
-    rejectedContracts: 3
+    activeProjects: 6, // accepted, funded, work-submitted (3 original + 3 new)
+    completedProjects: 1, // released
+    rejectedContracts: 1 // declined
   }
 };

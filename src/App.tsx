@@ -15,8 +15,8 @@ import CreateContract from "./pages/contracts/CreateContract";
 import DashboardPage from "./pages/DashboardPage";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-
-// ✅ Add missing imports
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthInitializer from "./components/AuthInitializer";
 
 const queryClient = new QueryClient();
 
@@ -26,26 +26,30 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/contracts/create" element={<CreateContract />} />
-            <Route
-              path="/register"
-              element={<Register onRegister={() => {}} />}
-            />
-            <Route
-              path="/login"
-              element={<Login onLogin={() => {}} />}
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AuthInitializer>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/contracts/create" element={
+                <ProtectedRoute allowedRoles={['freelancer']}>
+                  <CreateContract />
+                </ProtectedRoute>
+              } />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthInitializer>
       </TooltipProvider>
     </QueryClientProvider>
-  </Provider> // ✅ properly closed
+  </Provider>
 );
 
 export default App;

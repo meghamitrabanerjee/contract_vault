@@ -33,17 +33,18 @@ const CreateContractPage = () => {
   const [currency, setCurrency] = useState("USD");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [additionalClauses, setAdditionalClauses] = useState<string[]>([""]);
+  const [paymentTerms, setPaymentTerms] = useState<string[]>([""]);
   const [loading, setLoading] = useState(false);
 
-  const addClause = () => setAdditionalClauses((c) => [...c, ""]);
-  const updateClause = (idx: number, val: string) => {
-    const arr = [...additionalClauses];
+  // Payment terms handlers
+  const addPaymentTerm = () => setPaymentTerms((t) => [...t, ""]);
+  const updatePaymentTerm = (idx: number, val: string) => {
+    const arr = [...paymentTerms];
     arr[idx] = val;
-    setAdditionalClauses(arr);
+    setPaymentTerms(arr);
   };
-  const removeClause = (idx: number) => {
-    setAdditionalClauses((c) => c.filter((_, i) => i !== idx));
+  const removePaymentTerm = (idx: number) => {
+    setPaymentTerms((t) => t.filter((_, i) => i !== idx));
   };
 
   const validateForm = () => {
@@ -51,8 +52,8 @@ const CreateContractPage = () => {
       toast.error("Please fill in all required fields.");
       return false;
     }
-    if (additionalClauses.some((c) => c.trim() === "")) {
-      toast.error("Please remove empty clauses or fill them in.");
+    if (paymentTerms.some((t) => t.trim() === "")) {
+      toast.error("Please remove empty payment terms or fill them in.");
       return false;
     }
     return true;
@@ -72,7 +73,7 @@ const CreateContractPage = () => {
           currency,
           startDate,
           endDate,
-          additionalClauses,
+          paymentTerms, // ✅ sending payment terms instead of clauses
         },
       });
       toast.success("Contract created!");
@@ -101,6 +102,7 @@ const CreateContractPage = () => {
         </CardHeader>
 
         <CardContent className="px-8 py-8 space-y-8">
+          {/* Title + Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Contract Title*</Label>
@@ -112,6 +114,7 @@ const CreateContractPage = () => {
             </div>
           </div>
 
+          {/* Project Description */}
           <div>
             <Label>Project Description*</Label>
             <Textarea
@@ -123,6 +126,7 @@ const CreateContractPage = () => {
             />
           </div>
 
+          {/* Amount + Currency */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Total Amount*</Label>
@@ -143,6 +147,7 @@ const CreateContractPage = () => {
             </div>
           </div>
 
+          {/* Dates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Start Date*</Label>
@@ -154,24 +159,26 @@ const CreateContractPage = () => {
             </div>
           </div>
 
+          {/* Payment Terms */}
           <div>
-            <Label>Additional Clauses</Label>
+            <Label>Payment Terms*</Label>
             <div className="space-y-2 mt-2">
-              {additionalClauses.map((clause, idx) => (
+              {paymentTerms.map((term, idx) => (
                 <div key={idx} className="flex gap-2 items-start">
                   <Input
                     className="border border-gray-300"
-                    value={clause}
-                    onChange={(e) => updateClause(idx, e.target.value)}
-                    placeholder={`Clause ${idx + 1}`}
+                    value={term}
+                    onChange={(e) => updatePaymentTerm(idx, e.target.value)}
+                    placeholder={`Payment Term ${idx + 1}`}
                   />
-                  <button type="button" onClick={() => removeClause(idx)} className="text-red-500 font-bold px-2">×</button>
+                  <button type="button" onClick={() => removePaymentTerm(idx)} className="text-red-500 font-bold px-2">×</button>
                 </div>
               ))}
-              <Button type="button" size="sm" onClick={addClause}>+ Add Clause</Button>
+              <Button type="button" size="sm" onClick={addPaymentTerm}>+ Add Payment Term</Button>
             </div>
           </div>
 
+          {/* Submit */}
           <div className="pt-8 flex justify-center">
             <Button
               disabled={loading}
