@@ -6,7 +6,17 @@ const AnimatedBackground = () => {
   return (
     <div className="area">
       <ul className="circles">
-      
+        
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
         <li></li>
         <li></li>
         <li></li>
@@ -68,7 +78,7 @@ export const Hero = () => {
               className="group bg-emerald-500 hover:bg-emerald-600 text-white"
               asChild
             >
-              <a href="/role-selection">
+              <a href="/register">
                 Get Started
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </a>
