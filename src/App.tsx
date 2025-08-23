@@ -9,16 +9,14 @@ import { store } from './store';
 
 // Your main pages
 import Index from "./pages/Index";
-import RoleSelection from "./pages/RoleSelection";
-import FreelancerOnboarding from "./pages/onboarding/FreelancerOnboarding";
 import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 import CreateContract from "./pages/contracts/CreateContract";
-
-// ✅ Bolt dashboard page
 import DashboardPage from "./pages/DashboardPage";
 import Register from "./pages/Register";
-import Login  from "./pages/Login";
+import Login from "./pages/Login";
+
+// ✅ Add missing imports
 
 const queryClient = new QueryClient();
 
@@ -31,37 +29,23 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/role-selection" element={<RoleSelection />} />
-            <Route path="/onboarding/freelancer" element={<FreelancerOnboarding />} />
-            <Route path="/dashboard" element={<DashboardPage />} /> {/* ✅ dashboard here */}
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/contracts/create" element={<CreateContract />} />
             <Route
               path="/register"
-              element={
-                <Register
-                  onRegister={() => {
-                    // TODO: Implement registration logic or navigation
-                  }}
-                />
-              }
+              element={<Register onRegister={() => {}} />}
             />
             <Route
               path="/login"
-              element={
-                <Login
-                  onLogin={() => {
-                    // TODO: Implement login logic or navigation
-                  }}
-                />
-              }
+              element={<Login onLogin={() => {}} />}
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
-  </Provider>
+  </Provider> // ✅ properly closed
 );
 
 export default App;
